@@ -1,0 +1,7 @@
+{
+  "name": "Observasi Kinerja Guru",
+  "description": "Aplikasi observasi kinerja guru PMM SKP dengan sinkronisasi Google Spreadsheet dan notifikasi real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
