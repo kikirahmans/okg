@@ -1,7 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
-  base: './', // <-- gunakan './' agar semua file CSS & JS dapat dimuat di subfolder GitHub Pages
+  plugins: [react(), tailwindcss()],
+  base: './', // Memastikan aset (CSS/JS) dapat dimuat di subfolder GitHub Pages
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, '.'),
+    },
+  },
 });
