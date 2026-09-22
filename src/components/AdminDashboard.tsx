@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ObservationData, SheetConfig, NotificationItem } from '../types';
 import { INDICATORS } from '../data/indicators';
+import { getStoredObservees } from '../data/observees';
 import { exportToCSV } from '../services/googleSheets';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import {
@@ -19,7 +20,8 @@ import {
   CheckCircle2,
   AlertCircle,
   PlusCircle,
-  Sparkles
+  Sparkles,
+  UserCheck
 } from 'lucide-react';
 
 interface Props {
@@ -32,6 +34,7 @@ interface Props {
   onDeleteRecord: (id: string) => void;
   onOpenSettings: () => void;
   onAddSampleRecord: () => void;
+  onStartNewObservation?: (teacherName?: string) => void;
   latestNotification: NotificationItem | null;
   onDismissNotification: () => void;
 }
@@ -46,6 +49,7 @@ export const AdminDashboard: React.FC<Props> = ({
   onDeleteRecord,
   onOpenSettings,
   onAddSampleRecord,
+  onStartNewObservation,
   latestNotification,
   onDismissNotification
 }) => {
@@ -54,6 +58,7 @@ export const AdminDashboard: React.FC<Props> = ({
   const [selectedKesadaranFilter, setSelectedKesadaranFilter] = useState<string>('all');
   const [recordToDelete, setRecordToDelete] = useState<ObservationData | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const observeeList = getStoredObservees();
 
   // Metrics Calculation
   const totalObservations = records.length;
@@ -380,6 +385,110 @@ export const AdminDashboard: React.FC<Props> = ({
           </div>
         </div>
 
+      </div>
+
+      {/* 6 OBSERVEES DEDICATED TRACKER (Anti-Overwrite Management) */}
+      <div className="bg-white rounded border border-[#DDD8C9] shadow-xs p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#EAE6D9] pb-3">
+          <div>
+            <h3 className="font-serif font-bold text-sm text-[#1B2A41] flex items-center gap-2 m-0">
+              <UserCheck size={18} className="text-[#9C7A2E]" />
+              <span>Status & Progres Observasi 6 Guru Observee</span>
+            </h3>
+            <p className="text-xs text-[#4B5A6E] mt-0.5">
+              Setiap guru memiliki ID observasi terpisah sehingga data baru tidak akan menimpa observasi sebelumnya.
+            </p>
+          </div>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded bg-[#F5F3EC] text-[#9C7A2E] border border-[#DDD8C9] self-start sm:self-auto">
+            {records.filter(r => r.guru && observeeList.some(o => o.toLowerCase() === r.guru.toLowerCase())).length} Sesi Terdata
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          {observeeList.map(name => {
+            const teacherRecords = records.filter(
+              r => r.guru && r.guru.trim().toLowerCase() === name.trim().toLowerCase()
+            );
+            const hasData = teacherRecords.length > 0;
+            const latestRec = hasData ? teacherRecords[0] : null;
+
+            return (
+              <div
+                key={name}
+                className={`p-3.5 rounded border transition-all flex flex-col justify-between gap-3 ${
+                  hasData
+                    ? 'bg-[#FAFAF8] border-[#DDD8C9] hover:border-[#9C7A2E]/50'
+                    : 'bg-white border-dashed border-[#DDD8C9]'
+                }`}
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <span className="font-semibold text-xs text-[#1B2A41] leading-tight">
+                      {name}
+                    </span>
+                    {hasData ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
+                        {latestRec?.persentaseEfektif || 0}% Efektif
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200 shrink-0">
+                        Belum Ada
+                      </span>
+                    )}
+                  </div>
+
+                  {hasData && latestRec ? (
+                    <div className="text-[11px] text-[#4B5A6E] space-y-0.5">
+                      <p className="m-0 truncate">
+                        📚 {latestRec.kelas || 'Kelas belum diisi'}
+                      </p>
+                      <p className="m-0 text-[10px] text-gray-500">
+                        🗓️ {latestRec.tanggal || 'Tanggal -'} ({teacherRecords.length} kali observasi)
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-gray-400 italic m-0">
+                      Belum ada sesi observasi yang disimpan untuk guru ini.
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 pt-2 border-t border-[#EAE6D9]">
+                  {hasData && latestRec ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => onLoadIntoForm(latestRec)}
+                        className="flex-1 py-1.5 px-2 bg-white hover:bg-[#EAE6D9] border border-[#DDD8C9] rounded text-[11px] font-semibold text-[#1B2A41] transition-colors"
+                        title="Buka data observasi terakhir guru ini"
+                      >
+                        Buka Form
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onOpenDetail(latestRec)}
+                        className="p-1.5 bg-white hover:bg-[#EAE6D9] border border-[#DDD8C9] rounded text-[#4B5A6E] transition-colors"
+                        title="Lihat rincian lengkap"
+                      >
+                        <Eye size={13} />
+                      </button>
+                    </>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => onStartNewObservation && onStartNewObservation(name)}
+                    className="flex-1 py-1.5 px-2 bg-[#9C7A2E] hover:bg-[#856725] text-white rounded text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors shadow-xs"
+                    title="Mulai observasi baru untuk guru ini (ID baru, tidak menimpa data sebelumnya)"
+                  >
+                    <PlusCircle size={12} />
+                    <span>Observasi Baru</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Main Records Table Section */}

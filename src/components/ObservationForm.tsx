@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ObservationData, RatingValue, SheetConfig } from '../types';
 import { INDICATORS, RATINGS_LIST } from '../data/indicators';
+import { getStoredObservees } from '../data/observees';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw } from 'lucide-react';
+import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw, PlusCircle, UserCheck, AlertTriangle } from 'lucide-react';
 
 interface Props {
   currentRecord: ObservationData;
@@ -11,6 +12,7 @@ interface Props {
   savedRecords: ObservationData[];
   onLoadSavedRecord: (id: string) => void;
   onDeleteSavedRecord: (id: string) => void;
+  onNewObservation?: (observeeName?: string) => void;
   config: SheetConfig;
   isSaving: boolean;
 }
@@ -22,6 +24,7 @@ export const ObservationForm: React.FC<Props> = ({
   savedRecords,
   onLoadSavedRecord,
   onDeleteSavedRecord,
+  onNewObservation,
   config,
   isSaving
 }) => {
@@ -30,6 +33,7 @@ export const ObservationForm: React.FC<Props> = ({
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string; subtitle?: string } | null>(null);
   const [isDeletingItem, setIsDeletingItem] = useState(false);
+  const [observeesList] = useState<string[]>(() => getStoredObservees());
 
   useEffect(() => {
     if (currentRecord.syncedToGoogleSheets) {
@@ -127,19 +131,82 @@ export const ObservationForm: React.FC<Props> = ({
   return (
     <div className="pb-16 text-[#1B2A41]">
       
+      {/* QUICK OBSERVEES BAR (6 Observees Tracker) */}
+      <div className="bg-[#FAF8F3] border-b border-[#DDD8C9] px-4 sm:px-7 py-2.5">
+        <div className="max-w-[1180px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#1B2A41]">
+            <UserCheck size={15} className="text-[#9C7A2E]" />
+            <span>Pilih Cepat Guru Observee:</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {observeesList.map(name => {
+              const matchedRecords = savedRecords.filter(r => r.guru && r.guru.trim().toLowerCase() === name.trim().toLowerCase());
+              const isCurrent = currentRecord.guru && currentRecord.guru.trim().toLowerCase() === name.trim().toLowerCase();
+              const hasSaved = matchedRecords.length > 0;
+
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => {
+                    if (isCurrent) return;
+                    if (hasSaved) {
+                      // Buka observasi tersimpan yang terakhir untuk guru ini
+                      onLoadSavedRecord(matchedRecords[0].id);
+                    } else if (onNewObservation) {
+                      // Buat observasi baru untuk guru ini
+                      onNewObservation(name);
+                    } else {
+                      onUpdateCurrentRecord({ ...currentRecord, guru: name });
+                    }
+                  }}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-all flex items-center gap-1.5 ${
+                    isCurrent
+                      ? 'bg-[#1B2A41] text-white border-[#1B2A41] shadow-xs font-semibold'
+                      : hasSaved
+                      ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300 font-medium'
+                      : 'bg-white hover:bg-[#EAE6D9] text-[#4B5A6E] border-[#DDD8C9]'
+                  }`}
+                  title={hasSaved ? `${name} (Sudah ada ${matchedRecords.length} observasi)` : `${name} (Belum diobservasi)`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${isCurrent ? 'bg-amber-300' : hasSaved ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                  <span>{name}</span>
+                  {hasSaved && (
+                    <span className="text-[9px] opacity-75 font-mono">
+                      ({matchedRecords[0].persentaseEfektif || 0}%)
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* IDENTITY BAR */}
       <div className="bg-white border-b border-[#DDD8C9] shadow-xs">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-7 py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 text-xs">
           
           <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-[#4B5A6E] font-medium">Nama Guru (Observee)</label>
+            <label className="text-[11px] text-[#4B5A6E] font-medium flex items-center justify-between">
+              <span>Nama Guru (Observee)</span>
+              {currentRecord.guru && (
+                <span className="text-[10px] text-[#9C7A2E] font-normal">Tersedia 6 Observee</span>
+              )}
+            </label>
             <input
               id="i_guru"
+              list="observeeList"
               value={currentRecord.guru || ''}
               onChange={(e) => onUpdateCurrentRecord({ ...currentRecord, guru: e.target.value })}
-              placeholder="Nama lengkap guru"
+              placeholder="Pilih atau ketik nama guru"
               className="border border-[#DDD8C9] rounded px-2.5 py-1.5 bg-white text-[#1B2A41] text-xs focus:outline-none focus:border-[#9C7A2E]"
             />
+            <datalist id="observeeList">
+              {observeesList.map(name => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
           </div>
 
           <div className="flex flex-col gap-1">
@@ -202,13 +269,30 @@ export const ObservationForm: React.FC<Props> = ({
       {/* RECORDS ACTION BAR */}
       <div className="max-w-[1180px] mx-auto px-4 sm:px-7 py-3 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-[#DDD8C9] bg-[#F5F3EC]">
         
-        {/* Left: Saved records selector */}
-        <div className="flex items-center gap-2">
+        {/* Left: New Observation & Saved records selector */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Tombol Observasi Baru (Anti-Overwrite) */}
+          <button
+            type="button"
+            onClick={() => {
+              if (onNewObservation) {
+                onNewObservation();
+              }
+            }}
+            className="px-3 py-1.5 bg-[#9C7A2E] hover:bg-[#856725] text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
+            title="Mulai lembar observasi baru dengan ID unik terpisah agar tidak menimpa data sebelumnya"
+          >
+            <PlusCircle size={14} />
+            <span>Observasi Baru</span>
+          </button>
+
+          <div className="h-4 w-px bg-[#DDD8C9] mx-1 hidden sm:block" />
+
           <select
             id="recordSelect"
             value={selectedRecordId}
             onChange={(e) => setSelectedRecordId(e.target.value)}
-            className="border border-[#DDD8C9] rounded px-2.5 py-1.5 bg-white text-xs text-[#1B2A41] focus:outline-none max-w-[260px]"
+            className="border border-[#DDD8C9] rounded px-2.5 py-1.5 bg-white text-xs text-[#1B2A41] focus:outline-none max-w-[240px]"
           >
             <option value="">— Pilih Data Tersimpan —</option>
             {savedRecords.map(r => (
@@ -247,23 +331,22 @@ export const ObservationForm: React.FC<Props> = ({
             <Trash2 size={13} />
             Hapus
           </button>
+        </div>
 
-          {/* Quick button to delete/reset current active record */}
-          {currentRecord.id && savedRecords.some(r => r.id === currentRecord.id) && (
-            <button
-              onClick={() => {
-                setItemToDelete({
-                  id: currentRecord.id,
-                  name: currentRecord.guru || 'Data Formulir Aktif',
-                  subtitle: `Kelas: ${currentRecord.kelas || '-'} · Tanggal: ${currentRecord.tanggal || '-'}`
-                });
-              }}
-              className="px-2.5 py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 rounded text-xs font-medium flex items-center gap-1 transition-colors"
-              title="Hapus formulir yang sedang aktif ini"
-            >
-              <Trash2 size={12} />
-              Hapus Data Ini
-            </button>
+        {/* Center/Info: Anti-overwrite Status Indicator */}
+        <div className="flex items-center">
+          {savedRecords.some(r => r.id === currentRecord.id) ? (
+            <div className="flex items-center gap-1.5 text-[11px] text-amber-900 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded">
+              <AlertTriangle size={13} className="text-amber-600 shrink-0" />
+              <span>
+                Sedang mengedit: <strong>{currentRecord.guru || 'Data Tersimpan'}</strong>. (Gunakan <em>Observasi Baru</em> untuk guru lain).
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-[11px] text-emerald-900 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded">
+              <Check size={13} className="text-emerald-600 shrink-0" />
+              <span>Observasi Baru (ID Mandiri — data guru lain aman tidak tertimpa)</span>
+            </div>
           )}
         </div>
 
@@ -287,7 +370,7 @@ export const ObservationForm: React.FC<Props> = ({
             title="Simpan data ke Google Spreadsheet dan kirim notifikasi ke Admin Dashboard"
           >
             <Cloud size={14} className={isSaving ? 'animate-spin' : ''} />
-            <span>{isSaving ? 'Menyimpan ke Sheet...' : 'Simpan & Sinkron ke Spreadsheet'}</span>
+            <span>{isSaving ? 'Menyimpan...' : 'Simpan ke Spreadsheet'}</span>
           </button>
 
           <button

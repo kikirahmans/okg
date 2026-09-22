@@ -19,17 +19,17 @@ import { DetailModal } from './components/DetailModal';
 import { SheetsSettingsModal } from './components/SheetsSettingsModal';
 import { Watermark } from './components/Watermark';
 
-function createNewRecord(): ObservationData {
+function createNewRecord(template?: Partial<ObservationData>): ObservationData {
   return {
     id: `obs_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    guru: '',
-    kepsek: '',
-    kelas: '',
-    tempat: '',
-    periode: 'Januari - Juni 2026',
-    tanggal: new Date().toISOString().slice(0, 10),
+    guru: template?.guru || '',
+    kepsek: template?.kepsek || '',
+    kelas: template?.kelas || '',
+    tempat: template?.tempat || '',
+    periode: template?.periode || 'Januari - Juni 2026',
+    tanggal: template?.tanggal || new Date().toISOString().slice(0, 10),
     pickedIndicators: [],
     upayaBelajar: '',
     hariObs: new Date().toISOString().slice(0, 10),
@@ -124,12 +124,28 @@ export default function App() {
     }
   }, [config.soundEnabled, config.browserNotificationEnabled]);
 
-  // Handle Save to Google Sheets
+  // Handle Save to Google Sheets with Anti-Overwrite Protection
   const handleSaveToSheets = async (recordToSave: ObservationData) => {
     setIsSaving(true);
     try {
+      // ANTI-OVERWRITE PROTECTION:
+      // Periksa apakah ID yang digunakan sebelumnya milik guru yang berbeda atau ID sampel awal.
+      // Jika nama guru berubah atau ID sampel, buat ID unik baru agar data guru lama TIDAK PERNAH tertimpa!
+      let finalId = recordToSave.id;
+      const existing = records.find(r => r.id === recordToSave.id);
+      
+      const isTeacherChanged = existing && 
+        existing.guru && 
+        recordToSave.guru && 
+        existing.guru.trim().toLowerCase() !== recordToSave.guru.trim().toLowerCase();
+
+      if (isTeacherChanged || !finalId || finalId.startsWith('obs_sample_')) {
+        finalId = `obs_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      }
+
       const updatedRecord: ObservationData = {
         ...recordToSave,
+        id: finalId,
         updatedAt: new Date().toISOString(),
         syncedToGoogleSheets: true,
         syncTimestamp: new Date().toLocaleString('id-ID')
@@ -138,7 +154,7 @@ export default function App() {
       // Call Google Sheets API / Apps Script
       const syncResult = await syncRecordToGoogleSheets(updatedRecord, config);
 
-      // Update local state
+      // Update local state - pastikan tidak menimpa record guru lain
       setRecords(prev => {
         const idx = prev.findIndex(r => r.id === updatedRecord.id);
         if (idx >= 0) {
@@ -235,6 +251,18 @@ export default function App() {
     return () => clearInterval(timer);
   }, [config.autoSync, config.scriptUrl, config.syncIntervalSeconds, handleRefreshFromSheets]);
 
+  // Create New Observation with fresh unique ID (Anti-overwrite)
+  const handleCreateNewObservation = (observeeName?: string) => {
+    const newRec = createNewRecord({
+      guru: observeeName || '',
+      kepsek: currentRecord.kepsek || 'Abdul Bahsoan, M.Pd.',
+      tempat: currentRecord.tempat || 'SMK Negeri',
+      periode: currentRecord.periode || 'Januari - Juni 2026'
+    });
+    setCurrentRecord(newRec);
+    setActiveView('form');
+  };
+
   // Load Record into active form
   const handleLoadRecordIntoForm = (rec: ObservationData) => {
     setCurrentRecord(normalizeObservationRecord(rec));
@@ -257,7 +285,11 @@ export default function App() {
     
     // 2. Reset formulir jika data yang sedang diedit adalah yang dihapus
     if (currentRecord.id === id) {
-      setCurrentRecord(createNewRecord());
+      setCurrentRecord(createNewRecord({
+        kepsek: currentRecord.kepsek,
+        tempat: currentRecord.tempat,
+        periode: currentRecord.periode
+      }));
     }
 
     // 3. Hapus dari Google Spreadsheet & catat ke deletedRecordIds agar tidak muncul lagi saat polling
@@ -278,21 +310,23 @@ export default function App() {
     });
   };
 
-  // Add Sample Record for Immediate Live Testing
+  // Add Sample Record for Immediate Live Testing (Menggunakan 6 Observee)
   const handleAddSampleRecord = () => {
     const teacherNames = [
-      'Ahmad Zulkarnain, S.Pd.',
-      'Dewi Lestari, M.Pd.',
-      'Ir. Hendra Wijaya',
-      'Fitri Handayani, S.Pd.I.',
-      'Budi Santoso, S.T.'
+      'Lazijmatul Hilma Kau, M.Pd',
+      'Irfan Syahrul Basri, S.Pd',
+      'Rizal Abdul, S.Kom',
+      'Abdurrahman Abdullah, S.Pd.I',
+      'Tomy P. Lawani, S.Pd',
+      'Megawati Lihawa'
     ];
     const classes = [
-      'Teknik Komputer / XII TKJ-2',
-      'Desain Komunikasi Visual / X DKV-1',
-      'Akuntansi / XI AKL-3',
-      'Tata Boga / XI Kuliner-1',
-      'Otomotif / X TO-2'
+      'Bahasa Indonesia / XI SMK-1',
+      'Matematika / X SMK-2',
+      'Teknologi Informasi / XII RPL',
+      'Pendidikan Agama Islam / XI SMK-3',
+      'Pendidikan Jasmani / X SMK-1',
+      'Bahasa Inggris / XI SMK-2'
     ];
     const randomTeacher = teacherNames[Math.floor(Math.random() * teacherNames.length)];
     const randomClass = classes[Math.floor(Math.random() * classes.length)];
@@ -413,6 +447,7 @@ export default function App() {
             savedRecords={records}
             onLoadSavedRecord={handleLoadSavedRecordById}
             onDeleteSavedRecord={handleDeleteRecord}
+            onNewObservation={handleCreateNewObservation}
             config={config}
             isSaving={isSaving}
           />
@@ -427,6 +462,7 @@ export default function App() {
             onDeleteRecord={handleDeleteRecord}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onAddSampleRecord={handleAddSampleRecord}
+            onStartNewObservation={handleCreateNewObservation}
             latestNotification={latestNotification}
             onDismissNotification={() => setLatestNotification(null)}
           />
