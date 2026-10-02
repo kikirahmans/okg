@@ -3,7 +3,9 @@ import { ObservationData, RatingValue, SheetConfig } from '../types';
 import { INDICATORS, RATINGS_LIST } from '../data/indicators';
 import { getStoredObservees } from '../data/observees';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw, PlusCircle, UserCheck, AlertTriangle, MessageSquare } from 'lucide-react';
+import { AIAssistantModal } from './AIAssistantModal';
+import { AIAssistantType } from '../services/aiAssistant';
+import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw, PlusCircle, UserCheck, AlertTriangle, MessageSquare, Sparkles } from 'lucide-react';
 
 interface Props {
   currentRecord: ObservationData;
@@ -34,6 +36,29 @@ export const ObservationForm: React.FC<Props> = ({
   const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string; subtitle?: string } | null>(null);
   const [isDeletingItem, setIsDeletingItem] = useState(false);
   const [observeesList] = useState<string[]>(() => getStoredObservees());
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [aiModalType, setAiModalType] = useState<AIAssistantType>('rekomendasi_b');
+
+  const openAIAssistant = (type: AIAssistantType) => {
+    setAiModalType(type);
+    setAiModalOpen(true);
+  };
+
+  const handleApplyAISuggestion = (text: string, mode: 'replace' | 'append') => {
+    if (aiModalType === 'rekomendasi_b') {
+      const prev = currentRecord.rekomendasi || '';
+      const next = mode === 'append' && prev.trim() ? `${prev}\n\n${text}` : text;
+      onUpdateCurrentRecord({ ...currentRecord, rekomendasi: next });
+    } else if (aiModalType === 'pertanyaan_c') {
+      const prev = currentRecord.pertanyaanC || '';
+      const next = mode === 'append' && prev.trim() ? `${prev}\n\n${text}` : text;
+      onUpdateCurrentRecord({ ...currentRecord, pertanyaanC: next });
+    } else if (aiModalType === 'pertanyaan_d') {
+      const prev = currentRecord.pertanyaanD || '';
+      const next = mode === 'append' && prev.trim() ? `${prev}\n\n${text}` : text;
+      onUpdateCurrentRecord({ ...currentRecord, pertanyaanD: next });
+    }
+  };
 
   useEffect(() => {
     if (currentRecord.syncedToGoogleSheets) {
@@ -862,7 +887,18 @@ export const ObservationForm: React.FC<Props> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-[#4B5A6E] font-medium block">Rekomendasi</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-[#4B5A6E] font-medium block">Rekomendasi</label>
+                    <button
+                      type="button"
+                      onClick={() => openAIAssistant('rekomendasi_b')}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-50 hover:bg-amber-100 text-[#9C7A2E] border border-amber-300 text-[11px] font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
+                      title="Dapatkan rekomendasi tindak lanjut berbantuan AI"
+                    >
+                      <Sparkles size={12} className="text-[#9C7A2E]" />
+                      <span>AI Asisten Rekomendasi</span>
+                    </button>
+                  </div>
                   <textarea
                     id="b_rekomendasi"
                     rows={3}
@@ -945,7 +981,18 @@ export const ObservationForm: React.FC<Props> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs text-[#4B5A6E] font-medium block">Pertanyaan (Observer)</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-[#4B5A6E] font-medium block">Pertanyaan (Observer)</label>
+                    <button
+                      type="button"
+                      onClick={() => openAIAssistant('pertanyaan_c')}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-50 hover:bg-amber-100 text-[#9C7A2E] border border-amber-300 text-[11px] font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
+                      title="Dapatkan pertanyaan pemantik coaching berbantuan AI"
+                    >
+                      <Sparkles size={12} className="text-[#9C7A2E]" />
+                      <span>AI Asisten Pertanyaan</span>
+                    </button>
+                  </div>
                   <textarea
                     id="c_pertanyaan"
                     rows={2}
@@ -1197,7 +1244,18 @@ export const ObservationForm: React.FC<Props> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs text-[#4B5A6E] font-medium block">Pertanyaan (Observer)</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-[#4B5A6E] font-medium block">Pertanyaan (Observer)</label>
+                    <button
+                      type="button"
+                      onClick={() => openAIAssistant('pertanyaan_d')}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-50 hover:bg-amber-100 text-[#9C7A2E] border border-amber-300 text-[11px] font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
+                      title="Dapatkan pertanyaan refleksi tindak lanjut berbantuan AI"
+                    >
+                      <Sparkles size={12} className="text-[#9C7A2E]" />
+                      <span>AI Asisten Pertanyaan</span>
+                    </button>
+                  </div>
                   <textarea
                     id="d_pertanyaan"
                     rows={2}
@@ -1354,6 +1412,15 @@ export const ObservationForm: React.FC<Props> = ({
         recordName={itemToDelete?.name || 'Data Observasi'}
         recordSubtitle={itemToDelete?.subtitle}
         isDeleting={isDeletingItem}
+      />
+
+      {/* MODAL AI ASISTEN */}
+      <AIAssistantModal
+        isOpen={aiModalOpen}
+        type={aiModalType}
+        record={currentRecord}
+        onClose={() => setAiModalOpen(false)}
+        onApply={handleApplyAISuggestion}
       />
 
       {/* FOOTER WATERMARK BAGIAN BAWAH */}
