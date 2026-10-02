@@ -12,15 +12,57 @@
   }
 }
 
+/* In screen mode, hide print-only */
+.print-only {
+  display: none !important;
+}
+
 @media print {
-  header, nav, .no-print, button, #recordSelect, select {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm 12mm 14mm;
+  }
+
+  html, body {
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 10pt !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide screen container and interactive elements */
+  .screen-only, header, nav, .no-print, button, select, input, textarea, .backdrop-blur-xs {
     display: none !important;
   }
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
+
+  /* Show dedicated print document */
+  .print-only {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    visibility: visible !important;
   }
-  .border, .border-b, .border-t {
-    border-color: #ccc !important;
+
+  .avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .page-break {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }
+

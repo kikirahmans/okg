@@ -35,10 +35,11 @@ export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              title="Cetak atau simpan dokumen lengkap (Formulir A s.d D dan Tanda Tangan) dalam ukuran A4"
+              className="px-3.5 py-1.5 rounded bg-[#9C7A2E] hover:bg-[#7A5F22] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
             >
               <Printer size={14} />
-              Cetak Dokumen
+              <span>Cetak / Ekspor PDF A4</span>
             </button>
             <button
               onClick={onClose}
@@ -98,8 +99,9 @@ export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }
 
           {/* FORM A REVIEW */}
           <div className="border border-[#DDD8C9] rounded p-4 space-y-3 bg-white">
-            <h3 className="font-serif font-bold text-sm text-[#1B2A41] border-b border-[#DDD8C9] pb-1.5">
-              Formulir A — Diskusi Persiapan Observasi
+            <h3 className="font-serif font-bold text-sm text-[#1B2A41] border-b border-[#DDD8C9] pb-1.5 flex items-center justify-between">
+              <span>Formulir A — Diskusi Persiapan Observasi</span>
+              <span className="text-[11px] font-sans font-normal text-[#4B5A6E]">Tahap Pra-Observasi</span>
             </h3>
             
             <div>
@@ -122,15 +124,27 @@ export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div>
-                <span className="font-semibold text-[#4B5A6E] block">Upaya Mempelajari:</span>
-                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41]">
+                <span className="font-semibold text-[#4B5A6E] block">Upaya Mempelajari Target Perilaku:</span>
+                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41] leading-relaxed">
                   {record.upayaBelajar || '-'}
                 </p>
               </div>
               <div>
                 <span className="font-semibold text-[#4B5A6E] block">Perangkat Ajar &amp; Waktu:</span>
-                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41]">
+                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41] leading-relaxed">
                   {record.perangkatAjar || '-'} ({record.waktuObs || '-'})
+                </p>
+              </div>
+              <div>
+                <span className="font-semibold text-[#4B5A6E] block">Hasil Kerja yang Diharapkan:</span>
+                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41] leading-relaxed">
+                  {record.hasilKerja || '-'}
+                </p>
+              </div>
+              <div>
+                <span className="font-semibold text-[#4B5A6E] block">Catatan Persiapan Lainnya:</span>
+                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41] leading-relaxed">
+                  {record.catatanLain || '-'}
                 </p>
               </div>
             </div>
@@ -236,58 +250,193 @@ export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }
           </div>
 
           {/* FORM C & D REVIEW */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
             {/* Form C */}
-            <div className="border border-[#DDD8C9] rounded p-4 space-y-2 bg-white">
-              <h3 className="font-serif font-bold text-sm text-[#1B2A41] border-b border-[#DDD8C9] pb-1.5">
-                Formulir C — Tindak Lanjut
+            <div className="border border-[#DDD8C9] rounded p-4 space-y-3 bg-white">
+              <h3 className="font-serif font-bold text-sm text-[#1B2A41] border-b border-[#DDD8C9] pb-1.5 flex items-center justify-between">
+                <span>Formulir C — Tindak Lanjut</span>
+                <span className="text-[11px] font-sans font-normal text-[#4B5A6E]">Tahap Pasca-Observasi</span>
               </h3>
+              
               <div>
-                <span className="font-semibold text-[#4B5A6E] block">Kategori Kesadaran Guru:</span>
-                <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full font-semibold text-xs bg-[#FBF3E1] text-[#7A5F22]">
-                  {record.kategoriKesadaranC || 'Belum Diisi'}
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Kategori Kesadaran Guru:</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full font-semibold text-xs bg-[#FBF3E1] text-[#7A5F22]">
+                  {record.kategoriKesadaranC || 'Sadar Kesulitan'}
                 </span>
               </div>
+
               <div>
-                <span className="font-semibold text-[#4B5A6E] block">Upaya Tindak Lanjut:</span>
-                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41]">
-                  {record.upayaTL || '-'}
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Pertanyaan Pemantik (Observer):</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] italic leading-relaxed">
+                  {record.pertanyaanC || '-'}
                 </p>
               </div>
+
               <div>
-                <span className="font-semibold text-[#4B5A6E] block">Waktu &amp; Dukungan:</span>
-                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41]">
-                  {record.kapanTL || '-'} · Dukungan: {record.dukunganTL || '-'}
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Respon Guru Terhadap Pertanyaan:</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
+                  {record.responC || '-'}
                 </p>
               </div>
+
+              <div>
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Catatan Refleksi Bersama:</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
+                  {record.catatanC || '-'}
+                </p>
+              </div>
+
+              {/* Rencana Tindak Lanjut */}
+              <div className="bg-[#FAF8F3] border border-[#E8DFCA] p-2.5 rounded space-y-1.5">
+                <span className="font-bold text-[#7A5F22] block text-[11px] uppercase tracking-wide">
+                  Rencana Program Tindak Lanjut
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span className="font-semibold text-[#4B5A6E] block">Tujuan:</span>
+                    <span className="text-[#1B2A41]">{record.tujuanTL || '-'}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#4B5A6E] block">Upaya / Strategi:</span>
+                    <span className="text-[#1B2A41]">{record.upayaTL || '-'}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#4B5A6E] block">Waktu Pelaksanaan:</span>
+                    <span className="text-[#1B2A41]">{record.kapanTL || '-'}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#4B5A6E] block">Kebutuhan Dukungan:</span>
+                    <span className="text-[#1B2A41]">{record.dukunganTL || '-'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {record.catatanKepsekC && (
+                <div>
+                  <span className="font-semibold text-[#4B5A6E] block mb-0.5">Catatan Observer / Kepala Sekolah:</span>
+                  <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
+                    {record.catatanKepsekC}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Form D */}
-            <div className="border border-[#DDD8C9] rounded p-4 space-y-2 bg-white">
-              <h3 className="font-serif font-bold text-sm text-[#1B2A41] border-b border-[#DDD8C9] pb-1.5">
-                Formulir D — Refleksi Tindak Lanjut
+            <div className="border border-[#DDD8C9] rounded p-4 space-y-3 bg-white">
+              <h3 className="font-serif font-bold text-sm text-[#1B2A41] border-b border-[#DDD8C9] pb-1.5 flex items-center justify-between">
+                <span>Formulir D — Refleksi Tindak Lanjut</span>
+                <span className="text-[11px] font-sans font-normal text-[#4B5A6E]">Tahap Refleksi Akhir</span>
               </h3>
-              <div>
-                <span className="font-semibold text-[#4B5A6E] block">Kategori Tindak Lanjut:</span>
-                <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full font-semibold text-xs bg-[#EAF1EA] text-[#3D6B4F]">
-                  {record.kategoriTLD || 'Belum Diisi'}
-                </span>
+
+              <div className="flex flex-wrap gap-2">
+                <div>
+                  <span className="font-semibold text-[#4B5A6E] block mb-0.5">Kategori Tindak Lanjut:</span>
+                  <span className="inline-block px-2.5 py-0.5 rounded-full font-semibold text-xs bg-[#EAF1EA] text-[#3D6B4F]">
+                    {record.kategoriTLD || 'Peningkatan Kinerja'}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-semibold text-[#4B5A6E] block mb-0.5">Tingkat Kesadaran Akhir:</span>
+                  <span className="inline-block px-2.5 py-0.5 rounded-full font-semibold text-xs bg-[#EBF2FA] text-[#2B5C8F]">
+                    {record.kesadaranD || 'Sadar Dampak Kesulitan'}
+                  </span>
+                </div>
               </div>
+
               <div>
-                <span className="font-semibold text-[#4B5A6E] block">Capaian:</span>
-                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41]">
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Capaian / Kemajuan Kelas:</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
                   {record.capaianD || '-'}
                 </p>
               </div>
+
               <div>
-                <span className="font-semibold text-[#4B5A6E] block">Tantangan &amp; Upaya Peningkatan:</span>
-                <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] mt-1 text-[#1B2A41]">
-                  {record.tantanganD || '-'} · Lanjutan: {record.upayaPeningkatanD || '-'}
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Tantangan yang Dihadapi:</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
+                  {record.tantanganD || '-'}
                 </p>
               </div>
+
+              <div>
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Upaya Peningkatan Lanjutan:</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
+                  {record.upayaPeningkatanD || '-'}
+                </p>
+              </div>
+
+              <div>
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Pertanyaan Refleksi (Observer):</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] italic leading-relaxed">
+                  {record.pertanyaanD || '-'}
+                </p>
+              </div>
+
+              <div>
+                <span className="font-semibold text-[#4B5A6E] block mb-0.5">Respon Refleksi Guru:</span>
+                <p className="bg-[#FAFAF8] p-2.5 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
+                  {record.responD || '-'}
+                </p>
+              </div>
+
+              {record.catatanKepsekD && (
+                <div>
+                  <span className="font-semibold text-[#4B5A6E] block mb-0.5">Catatan / Evaluasi Kepala Sekolah:</span>
+                  <p className="bg-[#FAFAF8] p-2 rounded border border-[#EAE6D9] text-[#1B2A41] leading-relaxed">
+                    {record.catatanKepsekD}
+                  </p>
+                </div>
+              )}
             </div>
 
+          </div>
+
+          {/* LEMBAR PENGESAHAN & TANDA TANGAN REVIEW */}
+          <div className="border border-[#DDD8C9] rounded p-4 bg-[#FAF9F5] space-y-3">
+            <h3 className="font-serif font-bold text-sm text-[#1B2A41] border-b border-[#DDD8C9] pb-1.5 flex items-center justify-between">
+              <span>Lembar Pengesahan &amp; Tanda Tangan Observasi</span>
+              <span className="text-[11px] font-sans text-[#4B5A6E]">
+                {record.tempat || 'Ditetapkan'}, {record.tanggal || '-'}
+              </span>
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+              {/* Observee */}
+              <div className="p-3 bg-white border border-[#DDD8C9] rounded text-center">
+                <span className="text-[11px] text-[#4B5A6E] font-medium block">
+                  Guru yang Diobservasi (Observee)
+                </span>
+                <div className="h-14 flex items-center justify-center text-gray-400 text-xs italic">
+                  [ Ruang Tanda Tangan ]
+                </div>
+                <div className="border-t border-[#DDD8C9] pt-1">
+                  <span className="font-bold text-xs text-[#1B2A41] block">
+                    {record.guru || '...........................................'}
+                  </span>
+                  <span className="text-[10px] text-[#4B5A6E]">
+                    NIP. .....................................................
+                  </span>
+                </div>
+              </div>
+
+              {/* Observer */}
+              <div className="p-3 bg-white border border-[#DDD8C9] rounded text-center">
+                <span className="text-[11px] text-[#4B5A6E] font-medium block">
+                  Observer / Kepala Sekolah (Penilai)
+                </span>
+                <div className="h-14 flex items-center justify-center text-gray-400 text-xs italic">
+                  [ Ruang Tanda Tangan ]
+                </div>
+                <div className="border-t border-[#DDD8C9] pt-1">
+                  <span className="font-bold text-xs text-[#1B2A41] block">
+                    {record.kepsek || '...........................................'}
+                  </span>
+                  <span className="text-[10px] text-[#4B5A6E]">
+                    NIP. .....................................................
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>

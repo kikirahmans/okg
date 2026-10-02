@@ -411,10 +411,11 @@ export const ObservationForm: React.FC<Props> = ({
 
           <button
             onClick={() => window.print()}
-            className="px-3 py-1.5 bg-white hover:bg-[#EAE6D9] border border-[#DDD8C9] text-[#1B2A41] rounded text-xs font-semibold flex items-center gap-1 transition-colors"
+            title="Cetak dokumen resmi ukuran A4 mencakup Formulir A sampai dengan D beserta tanda tangan Observer dan Observee"
+            className="px-3.5 py-1.5 bg-white hover:bg-[#EAE6D9] border border-[#DDD8C9] text-[#1B2A41] rounded text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs hover:shadow-xs cursor-pointer"
           >
             <Printer size={13} />
-            Cetak PDF
+            <span>Cetak / Ekspor PDF A4</span>
           </button>
         </div>
 
@@ -1378,10 +1379,11 @@ export const ObservationForm: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-4 py-2.5 bg-[#1B2A41] hover:bg-[#111c2e] text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
+                  title="Cetak dokumen resmi ukuran A4 mencakup Formulir A sampai dengan D beserta tanda tangan Observer dan Observee"
+                  className="px-4 py-2.5 bg-[#1B2A41] hover:bg-[#111c2e] text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                 >
                   <Printer size={14} />
-                  <span>Cetak / Ekspor PDF</span>
+                  <span>Cetak / Ekspor PDF A4</span>
                 </button>
               </div>
             </div>

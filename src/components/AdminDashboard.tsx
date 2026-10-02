@@ -21,7 +21,8 @@ import {
   AlertCircle,
   PlusCircle,
   Sparkles,
-  UserCheck
+  UserCheck,
+  Printer
 } from 'lucide-react';
 
 interface Props {
@@ -472,6 +473,17 @@ export const AdminDashboard: React.FC<Props> = ({
                       >
                         <Eye size={13} />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onOpenDetail(latestRec);
+                          setTimeout(() => window.print(), 150);
+                        }}
+                        className="p-1.5 bg-white hover:bg-[#EAE6D9] border border-[#DDD8C9] rounded text-[#4B5A6E] transition-colors"
+                        title="Cetak Laporan A4 (Formulir A s.d D)"
+                      >
+                        <Printer size={13} />
+                      </button>
                     </>
                   ) : null}
 
@@ -665,6 +677,16 @@ export const AdminDashboard: React.FC<Props> = ({
                             title="Lihat Formulir Lengkap"
                           >
                             <Eye size={15} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              onOpenDetail(record);
+                              setTimeout(() => window.print(), 150);
+                            }}
+                            className="p-1.5 rounded hover:bg-[#F5F3EC] text-[#1B2A41] transition-colors"
+                            title="Cetak / Ekspor PDF A4 (Formulir A s.d D & Tanda Tangan)"
+                          >
+                            <Printer size={15} />
                           </button>
                           <button
                             onClick={() => onLoadIntoForm(record)}

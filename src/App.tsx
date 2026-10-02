@@ -17,6 +17,7 @@ import { ObservationForm } from './components/ObservationForm';
 import { AdminDashboard } from './components/AdminDashboard';
 import { DetailModal } from './components/DetailModal';
 import { SheetsSettingsModal } from './components/SheetsSettingsModal';
+import { PrintReport } from './components/PrintReport';
 import { Watermark } from './components/Watermark';
 import { getStoredObservees } from './data/observees';
 
@@ -417,82 +418,94 @@ export default function App() {
     }
   };
 
+  const printRecord = detailRecord || currentRecord;
+
   return (
     <div className="min-h-screen bg-[#F5F3EC] text-[#1B2A41] flex flex-col font-sans selection:bg-[#FBF3E1]">
       
-      {/* App Header & Navigation */}
-      <HeaderNav
-        activeView={activeView}
-        setActiveView={setActiveView}
-        config={config}
-        notifications={notifications}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        onMarkAllRead={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
-        onClearNotifications={() => setNotifications([])}
-        onSelectRecordFromNotif={(id) => {
-          const rec = records.find(r => r.id === id);
-          if (rec) {
-            setDetailRecord(rec);
-          }
-        }}
-        onToggleSound={() => setConfig(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }))}
-        totalRecordsCount={records.length}
-      />
+      {/* SCREEN INTERACTION CONTAINER (Sembunyi otomatis saat Cetak / Print PDF) */}
+      <div className="screen-only flex flex-col flex-1">
+        {/* App Header & Navigation */}
+        <HeaderNav
+          activeView={activeView}
+          setActiveView={setActiveView}
+          config={config}
+          notifications={notifications}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onMarkAllRead={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
+          onClearNotifications={() => setNotifications([])}
+          onSelectRecordFromNotif={(id) => {
+            const rec = records.find(r => r.id === id);
+            if (rec) {
+              setDetailRecord(rec);
+            }
+          }}
+          onToggleSound={() => setConfig(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }))}
+          totalRecordsCount={records.length}
+        />
 
-      {/* Main Content Area */}
-      <div className="flex-1">
-        {activeView === 'form' ? (
-          <ObservationForm
-            currentRecord={currentRecord}
-            onUpdateCurrentRecord={setCurrentRecord}
-            onSaveToSheets={handleSaveToSheets}
-            savedRecords={records}
-            onLoadSavedRecord={handleLoadSavedRecordById}
-            onDeleteSavedRecord={handleDeleteRecord}
-            onNewObservation={handleCreateNewObservation}
-            config={config}
-            isSaving={isSaving}
-          />
-        ) : (
-          <AdminDashboard
-            records={records}
-            config={config}
-            onRefreshFromSheets={handleRefreshFromSheets}
-            isRefreshing={isRefreshing}
-            onOpenDetail={(rec) => setDetailRecord(rec)}
+        {/* Main Content Area */}
+        <div className="flex-1">
+          {activeView === 'form' ? (
+            <ObservationForm
+              currentRecord={currentRecord}
+              onUpdateCurrentRecord={setCurrentRecord}
+              onSaveToSheets={handleSaveToSheets}
+              savedRecords={records}
+              onLoadSavedRecord={handleLoadSavedRecordById}
+              onDeleteSavedRecord={handleDeleteRecord}
+              onNewObservation={handleCreateNewObservation}
+              config={config}
+              isSaving={isSaving}
+            />
+          ) : (
+            <AdminDashboard
+              records={records}
+              config={config}
+              onRefreshFromSheets={handleRefreshFromSheets}
+              isRefreshing={isRefreshing}
+              onOpenDetail={(rec) => setDetailRecord(rec)}
+              onLoadIntoForm={handleLoadRecordIntoForm}
+              onDeleteRecord={handleDeleteRecord}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              onAddSampleRecord={handleAddSampleRecord}
+              onStartNewObservation={handleCreateNewObservation}
+              latestNotification={latestNotification}
+              onDismissNotification={() => setLatestNotification(null)}
+            />
+          )}
+        </div>
+
+        {/* Detail Inspection Modal */}
+        {detailRecord && (
+          <DetailModal
+            record={detailRecord}
+            onClose={() => setDetailRecord(null)}
             onLoadIntoForm={handleLoadRecordIntoForm}
-            onDeleteRecord={handleDeleteRecord}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onAddSampleRecord={handleAddSampleRecord}
-            onStartNewObservation={handleCreateNewObservation}
-            latestNotification={latestNotification}
-            onDismissNotification={() => setLatestNotification(null)}
           />
         )}
+
+        {/* Google Spreadsheet Configuration Modal */}
+        {isSettingsOpen && (
+          <SheetsSettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+            config={config}
+            onSaveConfig={(newCfg) => setConfig(newCfg)}
+            onTestConnection={handleTestConnection}
+          />
+        )}
+
+        {/* Watermark Bagian Bawah & Samping (kikybahsoan) */}
+        <Watermark text="kikybahsoan" showSide={true} showBottom={true} />
       </div>
 
-      {/* Detail Inspection Modal */}
-      {detailRecord && (
-        <DetailModal
-          record={detailRecord}
-          onClose={() => setDetailRecord(null)}
-          onLoadIntoForm={handleLoadRecordIntoForm}
-        />
-      )}
-
-      {/* Google Spreadsheet Configuration Modal */}
-      {isSettingsOpen && (
-        <SheetsSettingsModal
-          isOpen={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
-          config={config}
-          onSaveConfig={(newCfg) => setConfig(newCfg)}
-          onTestConnection={handleTestConnection}
-        />
-      )}
-
-      {/* Watermark Bagian Bawah & Samping (kikybahsoan) */}
-      <Watermark text="kikybahsoan" showSide={true} showBottom={true} />
+      {/* DOKUMEN CETAK / EKSPOR PDF A4 RESMI (Hanya aktif dan dirender saat window.print) */}
+      <div id="printable-report" className="print-only">
+        {printRecord && (
+          <PrintReport record={printRecord} />
+        )}
+      </div>
 
     </div>
   );
