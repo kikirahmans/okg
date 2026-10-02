@@ -4,7 +4,8 @@ export const DEFAULT_OBSERVEES = [
   'Rizal Abdul, S.Kom',
   'Abdurrahman Abdullah, S.Pd.I',
   'Tomy P. Lawani, S.Pd',
-  'Megawati Lihawa'
+  'Megawati Lihawa',
+  'Suryaningsi S.Pd'
 ] as const;
 
 export const STORAGE_KEY_OBSERVEES = 'pmm_custom_observees';

@@ -131,7 +131,7 @@ export const ObservationForm: React.FC<Props> = ({
   return (
     <div className="pb-16 text-[#1B2A41]">
       
-      {/* QUICK OBSERVEES BAR (6 Observees Tracker) */}
+      {/* QUICK OBSERVEES BAR (Observees Tracker) */}
       <div className="bg-[#FAF8F3] border-b border-[#DDD8C9] px-4 sm:px-7 py-2.5">
         <div className="max-w-[1180px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#1B2A41]">
@@ -191,7 +191,7 @@ export const ObservationForm: React.FC<Props> = ({
             <label className="text-[11px] text-[#4B5A6E] font-medium flex items-center justify-between">
               <span>Nama Guru (Observee)</span>
               {currentRecord.guru && (
-                <span className="text-[10px] text-[#9C7A2E] font-normal">Tersedia 6 Observee</span>
+                <span className="text-[10px] text-[#9C7A2E] font-normal">Tersedia {observeesList.length} Observee</span>
               )}
             </label>
             <input

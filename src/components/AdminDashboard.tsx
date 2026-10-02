@@ -387,13 +387,13 @@ export const AdminDashboard: React.FC<Props> = ({
 
       </div>
 
-      {/* 6 OBSERVEES DEDICATED TRACKER (Anti-Overwrite Management) */}
+      {/* OBSERVEES DEDICATED TRACKER (Anti-Overwrite Management) */}
       <div className="bg-white rounded border border-[#DDD8C9] shadow-xs p-5 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#EAE6D9] pb-3">
           <div>
             <h3 className="font-serif font-bold text-sm text-[#1B2A41] flex items-center gap-2 m-0">
               <UserCheck size={18} className="text-[#9C7A2E]" />
-              <span>Status & Progres Observasi 6 Guru Observee</span>
+              <span>Status & Progres Observasi {observeeList.length} Guru Observee</span>
             </h3>
             <p className="text-xs text-[#4B5A6E] mt-0.5">
               Setiap guru memiliki ID observasi terpisah sehingga data baru tidak akan menimpa observasi sebelumnya.

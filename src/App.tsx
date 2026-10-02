@@ -18,6 +18,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { DetailModal } from './components/DetailModal';
 import { SheetsSettingsModal } from './components/SheetsSettingsModal';
 import { Watermark } from './components/Watermark';
+import { getStoredObservees } from './data/observees';
 
 function createNewRecord(template?: Partial<ObservationData>): ObservationData {
   return {
@@ -310,23 +311,17 @@ export default function App() {
     });
   };
 
-  // Add Sample Record for Immediate Live Testing (Menggunakan 6 Observee)
+  // Add Sample Record for Immediate Live Testing (Menggunakan Guru Observee)
   const handleAddSampleRecord = () => {
-    const teacherNames = [
-      'Lazijmatul Hilma Kau, M.Pd',
-      'Irfan Syahrul Basri, S.Pd',
-      'Rizal Abdul, S.Kom',
-      'Abdurrahman Abdullah, S.Pd.I',
-      'Tomy P. Lawani, S.Pd',
-      'Megawati Lihawa'
-    ];
+    const teacherNames = getStoredObservees();
     const classes = [
       'Bahasa Indonesia / XI SMK-1',
       'Matematika / X SMK-2',
       'Teknologi Informasi / XII RPL',
       'Pendidikan Agama Islam / XI SMK-3',
       'Pendidikan Jasmani / X SMK-1',
-      'Bahasa Inggris / XI SMK-2'
+      'Bahasa Inggris / XI SMK-2',
+      'Ilmu Pengetahuan Alam / X SMK-3'
     ];
     const randomTeacher = teacherNames[Math.floor(Math.random() * teacherNames.length)];
     const randomClass = classes[Math.floor(Math.random() * classes.length)];
