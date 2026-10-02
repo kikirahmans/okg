@@ -1,15 +1,19 @@
 import React from 'react';
-import { ObservationData } from '../types';
+import { ObservationData, KopConfig } from '../types';
 import { INDICATORS } from '../data/indicators';
+import { LogoRenderer } from './LogoRenderer';
+import { getStoredKopConfig } from '../services/kopSettings';
 
 interface Props {
   record: ObservationData;
+  kopConfig?: KopConfig;
 }
 
-export const PrintReport: React.FC<Props> = ({ record }) => {
+export const PrintReport: React.FC<Props> = ({ record, kopConfig }) => {
   const ratings = record.ratings || {};
   const catatanIndikator = record.catatanIndikator || {};
   const pickedIndicators = record.pickedIndicators || [];
+  const kop = kopConfig || getStoredKopConfig();
 
   // Helper untuk format tanggal Indonesia
   const formatDateID = (dateStr?: string) => {
@@ -29,57 +33,82 @@ export const PrintReport: React.FC<Props> = ({ record }) => {
   };
 
   const formattedDate = formatDateID(record.tanggal);
+  const displaySchoolName = kop.namaSekolah || record.tempat || '';
 
   return (
     <div className="print-report-root bg-white text-gray-900 font-sans text-[11px] leading-relaxed max-w-[210mm] mx-auto p-4 print:p-0">
       
       {/* ======================================================== */}
-      {/* 1. KOP RESMI DOKUMEN OBSERVASI PMM KEMDIKBUDRISTEK       */}
+      {/* 1. KOP RESMI DOKUMEN OBSERVASI (KUSTOMISASI RESMI)       */}
       {/* ======================================================== */}
-      <div className="border-b-2 border-black pb-2 mb-3 avoid-break">
+      <div className="pb-2 mb-3 avoid-break">
         <div className="flex items-center justify-between gap-4">
           
-          {/* Logo Tut Wuri Handayani / PMM Badge */}
-          <div className="w-16 h-16 shrink-0 flex items-center justify-center">
-            <svg viewBox="0 0 100 100" className="w-14 h-14" fill="none" stroke="currentColor">
-              {/* Tut Wuri Handayani stylized emblem */}
-              <circle cx="50" cy="50" r="45" stroke="#1B2A41" strokeWidth="2.5" fill="#FAF8F3" />
-              <polygon points="50,15 58,35 80,35 62,49 69,70 50,56 31,70 38,49 20,35 42,35" fill="#9C7A2E" />
-              <circle cx="50" cy="50" r="16" fill="#1B2A41" />
-              <circle cx="50" cy="50" r="12" fill="#FAF8F3" />
-              <path d="M42,50 Q50,42 58,50" stroke="#9C7A2E" strokeWidth="2" fill="none" />
-              <path d="M45,55 L55,55" stroke="#1B2A41" strokeWidth="1.5" />
-            </svg>
+          {/* Logo Sisi Kiri (Custom / Preset) */}
+          <div className="w-20 shrink-0 flex items-center justify-start min-h-[60px]">
+            {kop.showLeftLogo && (
+              <LogoRenderer
+                type={kop.leftLogoType}
+                customUrl={kop.leftLogoUrl}
+                width={kop.leftLogoWidth || 64}
+                alt="Logo Kiri"
+              />
+            )}
           </div>
 
-          {/* Heading Teks KOP */}
-          <div className="flex-1 text-center">
-            <p className="font-bold text-[12px] uppercase tracking-wider text-black m-0">
-              Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi
-            </p>
-            <p className="font-semibold text-[11px] uppercase tracking-wide text-gray-800 m-0">
-              Direktorat Jenderal Guru dan Tenaga Kependidikan
-            </p>
-            <p className="font-bold text-[13px] uppercase tracking-wide text-[#1B2A41] mt-0.5 m-0 font-serif">
-              Pengelolaan Kinerja Guru — Platform Merdeka Mengajar (PMM)
-            </p>
-            <p className="text-[10px] text-gray-600 m-0 italic mt-0.5">
-              Laporan Hasil Observasi Praktik Kinerja Guru Berdasarkan Rubrik Observasi Kinerja
-            </p>
+          {/* Heading Teks KOP Surat Resmi */}
+          <div className="flex-1 text-center px-1">
+            {kop.instansiTingkat1 && (
+              <p className="font-bold text-[12px] uppercase tracking-wider text-black m-0 leading-tight">
+                {kop.instansiTingkat1}
+              </p>
+            )}
+            {kop.instansiTingkat2 && (
+              <p className="font-semibold text-[11px] uppercase tracking-wide text-gray-800 m-0 leading-tight mt-0.5">
+                {kop.instansiTingkat2}
+              </p>
+            )}
+            {displaySchoolName && (
+              <p className="font-bold text-[13px] uppercase tracking-wide text-[#1B2A41] font-serif m-0 leading-tight mt-0.5">
+                {displaySchoolName}
+              </p>
+            )}
+            {kop.alamatKontak && (
+              <p className="text-[9.5px] text-gray-600 m-0 italic mt-0.5 leading-tight">
+                {kop.alamatKontak}
+              </p>
+            )}
+            {kop.judulDokumen && (
+              <p className="font-bold text-[11px] uppercase tracking-wide text-[#9C7A2E] mt-1.5 m-0 font-serif">
+                {kop.judulDokumen}
+              </p>
+            )}
+            {kop.subJudulDokumen && (
+              <p className="text-[10px] text-gray-600 m-0 italic mt-0.5">
+                {kop.subJudulDokumen}
+              </p>
+            )}
           </div>
 
-          {/* Badge PMM SKP */}
-          <div className="w-16 shrink-0 text-right">
-            <div className="inline-block border border-gray-400 rounded px-1.5 py-0.5 text-center text-[9px] font-mono uppercase bg-gray-50">
-              <span className="block font-bold text-[#9C7A2E]">PMM</span>
-              <span className="block text-gray-600 font-semibold">SKP 2026</span>
-            </div>
+          {/* Logo Sisi Kanan (Custom / Preset) */}
+          <div className="w-20 shrink-0 flex items-center justify-end min-h-[60px]">
+            {kop.showRightLogo && (
+              <LogoRenderer
+                type={kop.rightLogoType}
+                customUrl={kop.rightLogoUrl}
+                width={kop.rightLogoWidth || 64}
+                alt="Logo Kanan"
+              />
+            )}
           </div>
 
         </div>
 
-        {/* Double Border Divider */}
-        <div className="border-b border-black mt-2"></div>
+        {/* Garis Pembatas KOP (Tebal - Tipis) */}
+        <div className="mt-2.5">
+          <div className="border-b-2 border-black"></div>
+          {kop.showDoubleLine && <div className="border-b border-black mt-0.5"></div>}
+        </div>
       </div>
 
       {/* ======================================================== */}

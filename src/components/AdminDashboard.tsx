@@ -22,7 +22,8 @@ import {
   PlusCircle,
   Sparkles,
   UserCheck,
-  Printer
+  Printer,
+  Building
 } from 'lucide-react';
 
 interface Props {
@@ -34,6 +35,7 @@ interface Props {
   onLoadIntoForm: (record: ObservationData) => void;
   onDeleteRecord: (id: string) => void;
   onOpenSettings: () => void;
+  onOpenKopSettings?: () => void;
   onAddSampleRecord: () => void;
   onStartNewObservation?: (teacherName?: string) => void;
   latestNotification: NotificationItem | null;
@@ -49,6 +51,7 @@ export const AdminDashboard: React.FC<Props> = ({
   onLoadIntoForm,
   onDeleteRecord,
   onOpenSettings,
+  onOpenKopSettings,
   onAddSampleRecord,
   onStartNewObservation,
   latestNotification,
@@ -189,6 +192,17 @@ export const AdminDashboard: React.FC<Props> = ({
               <ExternalLink size={14} />
               <span>Buka Spreadsheet</span>
             </a>
+          )}
+
+          {onOpenKopSettings && (
+            <button
+              onClick={onOpenKopSettings}
+              className="px-3 py-2 text-xs font-semibold bg-[#F5F3EC] hover:bg-[#EAE6D9] text-[#1B2A41] border border-[#DDD8C9] rounded flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Kustomisasi Logo Kiri, Logo Kanan, dan KOP Surat Cetak Laporan A4"
+            >
+              <Building size={14} className="text-[#9C7A2E]" />
+              <span>KOP &amp; Logo</span>
+            </button>
           )}
 
           <button

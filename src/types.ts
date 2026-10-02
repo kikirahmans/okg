@@ -92,3 +92,25 @@ export interface NotificationItem {
   recordId: string;
   efektifPct: number;
 }
+
+export type LogoPreset = 'preset_tutwuri' | 'preset_garuda' | 'preset_provinsi' | 'preset_pmm' | 'preset_smk' | 'custom' | 'none';
+
+export interface KopConfig {
+  showLeftLogo: boolean;
+  leftLogoType: LogoPreset;
+  leftLogoUrl: string; // base64 / URL
+  leftLogoWidth: number;
+
+  showRightLogo: boolean;
+  rightLogoType: LogoPreset;
+  rightLogoUrl: string; // base64 / URL
+  rightLogoWidth: number;
+
+  instansiTingkat1: string;
+  instansiTingkat2: string;
+  namaSekolah: string;
+  alamatKontak: string;
+  judulDokumen: string;
+  subJudulDokumen: string;
+  showDoubleLine: boolean;
+}

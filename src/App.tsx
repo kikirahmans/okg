@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ObservationData, SheetConfig, NotificationItem } from './types';
+import { ObservationData, SheetConfig, NotificationItem, KopConfig } from './types';
 import { INITIAL_SAMPLE_RECORDS } from './data/indicators';
 import {
   getStoredConfig,
@@ -11,12 +11,14 @@ import {
   deleteRecordFromGoogleSheets,
   normalizeObservationRecord
 } from './services/googleSheets';
+import { getStoredKopConfig, saveStoredKopConfig } from './services/kopSettings';
 import { playNotificationSound, sendBrowserNotification } from './services/soundNotification';
 import { HeaderNav } from './components/HeaderNav';
 import { ObservationForm } from './components/ObservationForm';
 import { AdminDashboard } from './components/AdminDashboard';
 import { DetailModal } from './components/DetailModal';
 import { SheetsSettingsModal } from './components/SheetsSettingsModal';
+import { KopSettingsModal } from './components/KopSettingsModal';
 import { PrintReport } from './components/PrintReport';
 import { Watermark } from './components/Watermark';
 import { getStoredObservees } from './data/observees';
@@ -82,6 +84,8 @@ export default function App() {
   });
 
   const [config, setConfig] = useState<SheetConfig>(() => getStoredConfig());
+  const [kopConfig, setKopConfig] = useState<KopConfig>(() => getStoredKopConfig());
+  const [isKopSettingsOpen, setIsKopSettingsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [latestNotification, setLatestNotification] = useState<NotificationItem | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -100,6 +104,11 @@ export default function App() {
   useEffect(() => {
     saveStoredConfig(config);
   }, [config]);
+
+  // Save KOP config whenever updated
+  useEffect(() => {
+    saveStoredKopConfig(kopConfig);
+  }, [kopConfig]);
 
   // Trigger Notification Helper
   const triggerNewNotification = useCallback((title: string, message: string, record: ObservationData) => {
@@ -432,6 +441,7 @@ export default function App() {
           config={config}
           notifications={notifications}
           onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenKopSettings={() => setIsKopSettingsOpen(true)}
           onMarkAllRead={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
           onClearNotifications={() => setNotifications([])}
           onSelectRecordFromNotif={(id) => {
@@ -455,6 +465,7 @@ export default function App() {
               onLoadSavedRecord={handleLoadSavedRecordById}
               onDeleteSavedRecord={handleDeleteRecord}
               onNewObservation={handleCreateNewObservation}
+              onOpenKopSettings={() => setIsKopSettingsOpen(true)}
               config={config}
               isSaving={isSaving}
             />
@@ -468,6 +479,7 @@ export default function App() {
               onLoadIntoForm={handleLoadRecordIntoForm}
               onDeleteRecord={handleDeleteRecord}
               onOpenSettings={() => setIsSettingsOpen(true)}
+              onOpenKopSettings={() => setIsKopSettingsOpen(true)}
               onAddSampleRecord={handleAddSampleRecord}
               onStartNewObservation={handleCreateNewObservation}
               latestNotification={latestNotification}
@@ -482,6 +494,7 @@ export default function App() {
             record={detailRecord}
             onClose={() => setDetailRecord(null)}
             onLoadIntoForm={handleLoadRecordIntoForm}
+            onOpenKopSettings={() => setIsKopSettingsOpen(true)}
           />
         )}
 
@@ -496,6 +509,15 @@ export default function App() {
           />
         )}
 
+        {/* KOP Surat & Logo Customization Modal */}
+        <KopSettingsModal
+          isOpen={isKopSettingsOpen}
+          onClose={() => setIsKopSettingsOpen(false)}
+          config={kopConfig}
+          onSaveConfig={(newKop) => setKopConfig(newKop)}
+          sampleSchoolName={currentRecord.tempat}
+        />
+
         {/* Watermark Bagian Bawah & Samping (kikybahsoan) */}
         <Watermark text="kikybahsoan" showSide={true} showBottom={true} />
       </div>
@@ -503,7 +525,7 @@ export default function App() {
       {/* DOKUMEN CETAK / EKSPOR PDF A4 RESMI (Hanya aktif dan dirender saat window.print) */}
       <div id="printable-report" className="print-only">
         {printRecord && (
-          <PrintReport record={printRecord} />
+          <PrintReport record={printRecord} kopConfig={kopConfig} />
         )}
       </div>
 

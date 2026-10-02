@@ -1,15 +1,16 @@
 import React from 'react';
 import { ObservationData } from '../types';
 import { INDICATORS } from '../data/indicators';
-import { X, Printer, CheckCircle, Clock, AlertCircle, MessageSquare } from 'lucide-react';
+import { X, Printer, CheckCircle, Clock, AlertCircle, MessageSquare, Sliders } from 'lucide-react';
 
 interface Props {
   record: ObservationData | null;
   onClose: () => void;
   onLoadIntoForm: (record: ObservationData) => void;
+  onOpenKopSettings?: () => void;
 }
 
-export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }) => {
+export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm, onOpenKopSettings }) => {
   if (!record) return null;
 
   return (
@@ -33,6 +34,18 @@ export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }
           </div>
           
           <div className="flex items-center gap-2">
+            {onOpenKopSettings && (
+              <button
+                type="button"
+                onClick={onOpenKopSettings}
+                title="Kustomisasi Logo Kiri, Logo Kanan, dan KOP Surat Cetak A4"
+                className="px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Sliders size={13} className="text-amber-400" />
+                <span>KOP &amp; Logo</span>
+              </button>
+            )}
+
             <button
               onClick={() => window.print()}
               title="Cetak atau simpan dokumen lengkap (Formulir A s.d D dan Tanda Tangan) dalam ukuran A4"

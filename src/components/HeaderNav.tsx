@@ -1,6 +1,6 @@
 import React from 'react';
 import { SheetConfig, NotificationItem } from '../types';
-import { Bell, Settings, FileText, LayoutDashboard, Radio } from 'lucide-react';
+import { Bell, Settings, FileText, LayoutDashboard, Radio, Building } from 'lucide-react';
 import { NotificationPopover } from './NotificationPopover';
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
   config: SheetConfig;
   notifications: NotificationItem[];
   onOpenSettings: () => void;
+  onOpenKopSettings?: () => void;
   onMarkAllRead: () => void;
   onClearNotifications: () => void;
   onSelectRecordFromNotif: (recordId: string) => void;
@@ -22,6 +23,7 @@ export const HeaderNav: React.FC<Props> = ({
   config,
   notifications,
   onOpenSettings,
+  onOpenKopSettings,
   onMarkAllRead,
   onClearNotifications,
   onSelectRecordFromNotif,
@@ -98,10 +100,22 @@ export const HeaderNav: React.FC<Props> = ({
             />
           </div>
 
+          {/* KOP & Logo Cetak button */}
+          {onOpenKopSettings && (
+            <button
+              onClick={onOpenKopSettings}
+              title="Kustomisasi Logo Kiri, Logo Kanan, dan KOP Surat Cetak A4"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/15 transition-colors cursor-pointer"
+            >
+              <Building size={14} className="text-amber-400" />
+              <span className="hidden sm:inline">KOP &amp; Logo</span>
+            </button>
+          )}
+
           {/* Google Spreadsheet Settings button */}
           <button
             onClick={onOpenSettings}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/15 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/15 transition-colors cursor-pointer"
           >
             <Settings size={14} />
             <span className="hidden sm:inline">Pengaturan Spreadsheet</span>

@@ -5,7 +5,7 @@ import { getStoredObservees } from '../data/observees';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { AIAssistantModal } from './AIAssistantModal';
 import { AIAssistantType } from '../services/aiAssistant';
-import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw, PlusCircle, UserCheck, AlertTriangle, MessageSquare, Sparkles } from 'lucide-react';
+import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw, PlusCircle, UserCheck, AlertTriangle, MessageSquare, Sparkles, Building, Sliders } from 'lucide-react';
 
 interface Props {
   currentRecord: ObservationData;
@@ -15,6 +15,7 @@ interface Props {
   onLoadSavedRecord: (id: string) => void;
   onDeleteSavedRecord: (id: string) => void;
   onNewObservation?: (observeeName?: string) => void;
+  onOpenKopSettings?: () => void;
   config: SheetConfig;
   isSaving: boolean;
 }
@@ -27,6 +28,7 @@ export const ObservationForm: React.FC<Props> = ({
   onLoadSavedRecord,
   onDeleteSavedRecord,
   onNewObservation,
+  onOpenKopSettings,
   config,
   isSaving
 }) => {
@@ -417,6 +419,18 @@ export const ObservationForm: React.FC<Props> = ({
             <Printer size={13} />
             <span>Cetak / Ekspor PDF A4</span>
           </button>
+
+          {onOpenKopSettings && (
+            <button
+              type="button"
+              onClick={onOpenKopSettings}
+              title="Kustomisasi Logo Kiri, Logo Kanan, dan Teks KOP Surat Laporan Cetak"
+              className="px-2.5 py-1.5 bg-white hover:bg-[#EAE6D9] border border-[#DDD8C9] text-[#1B2A41] rounded text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs hover:shadow-xs cursor-pointer"
+            >
+              <Sliders size={13} className="text-[#9C7A2E]" />
+              <span className="hidden sm:inline">KOP &amp; Logo</span>
+            </button>
+          )}
         </div>
 
       </div>
@@ -1385,6 +1399,17 @@ export const ObservationForm: React.FC<Props> = ({
                   <Printer size={14} />
                   <span>Cetak / Ekspor PDF A4</span>
                 </button>
+                {onOpenKopSettings && (
+                  <button
+                    type="button"
+                    onClick={onOpenKopSettings}
+                    title="Kustomisasi Logo Kiri, Logo Kanan, dan KOP Surat Laporan Cetak"
+                    className="px-3 py-2.5 bg-white hover:bg-[#EAE6D9] border border-[#DDD8C9] text-[#1B2A41] rounded text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Sliders size={14} className="text-[#9C7A2E]" />
+                    <span>KOP &amp; Logo</span>
+                  </button>
+                )}
               </div>
             </div>
 
