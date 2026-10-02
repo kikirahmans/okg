@@ -3,7 +3,7 @@ import { ObservationData, RatingValue, SheetConfig } from '../types';
 import { INDICATORS, RATINGS_LIST } from '../data/indicators';
 import { getStoredObservees } from '../data/observees';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw, PlusCircle, UserCheck, AlertTriangle } from 'lucide-react';
+import { Cloud, Save, Printer, ArrowRight, ArrowLeft, Trash2, FolderOpen, Check, RotateCcw, PlusCircle, UserCheck, AlertTriangle, MessageSquare } from 'lucide-react';
 
 interface Props {
   currentRecord: ObservationData;
@@ -72,6 +72,17 @@ export const ObservationForm: React.FC<Props> = ({
     recalcAndSave({
       ...currentRecord,
       ratings: nextRatings
+    });
+  };
+
+  // Set Observer Notes for Specific Indicator (Dianjurkan / Dihindari)
+  const setCatatanIndikator = (key: string, val: string) => {
+    onUpdateCurrentRecord({
+      ...currentRecord,
+      catatanIndikator: {
+        ...(currentRecord.catatanIndikator || {}),
+        [key]: val
+      }
     });
   };
 
@@ -723,6 +734,30 @@ export const ObservationForm: React.FC<Props> = ({
                             );
                           })}
                         </div>
+
+                        {/* Catatan Observer untuk Perilaku yang Dianjurkan */}
+                        <div className="mt-4 pt-3.5 border-t border-[#EAE6D9] bg-[#F7FAF8] -mx-4 -mb-4 p-4 rounded-b">
+                          <label
+                            htmlFor={`catatan_dianjurkan_${ind.id}`}
+                            className="flex items-center justify-between text-xs font-semibold text-[#3D6B4F] mb-1.5"
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <MessageSquare size={13} className="text-[#3D6B4F]" />
+                              <span>Catatan Observer (Perilaku yang Dianjurkan — Indikator {ind.id}):</span>
+                            </span>
+                            <span className="text-[10px] font-normal text-[#4B5A6E]">
+                              Bukti perilaku &amp; pengamatan penilai
+                            </span>
+                          </label>
+                          <textarea
+                            id={`catatan_dianjurkan_${ind.id}`}
+                            rows={2}
+                            value={(currentRecord.catatanIndikator || {})[`${ind.id}_dianjurkan`] || ''}
+                            onChange={(e) => setCatatanIndikator(`${ind.id}_dianjurkan`, e.target.value)}
+                            placeholder={`Tuliskan catatan observer untuk Perilaku yang Dianjurkan pada Indikator ${ind.id} (contoh: bukti teramati di kelas, respons murid, penguatan yang dilakukan guru)...`}
+                            className="w-full text-xs p-2.5 bg-white border border-[#C5D8C9] rounded focus:outline-none focus:border-[#3D6B4F] text-[#1B2A41] transition-all resize-y placeholder:text-gray-400"
+                          />
+                        </div>
                       </div>
 
                       {/* Perilaku yang Dihindari */}
@@ -774,6 +809,30 @@ export const ObservationForm: React.FC<Props> = ({
                               </div>
                             );
                           })}
+                        </div>
+
+                        {/* Catatan Observer untuk Perilaku yang Dihindari */}
+                        <div className="mt-4 pt-3.5 border-t border-[#EAE6D9] bg-[#FCF8F7] -mx-4 -mb-4 p-4 rounded-b">
+                          <label
+                            htmlFor={`catatan_dihindari_${ind.id}`}
+                            className="flex items-center justify-between text-xs font-semibold text-[#9C4A3D] mb-1.5"
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <MessageSquare size={13} className="text-[#9C4A3D]" />
+                              <span>Catatan Observer (Perilaku yang Dihindari — Indikator {ind.id}):</span>
+                            </span>
+                            <span className="text-[10px] font-normal text-[#4B5A6E]">
+                              Pengamatan &amp; catatan pencegahan
+                            </span>
+                          </label>
+                          <textarea
+                            id={`catatan_dihindari_${ind.id}`}
+                            rows={2}
+                            value={(currentRecord.catatanIndikator || {})[`${ind.id}_dihindari`] || ''}
+                            onChange={(e) => setCatatanIndikator(`${ind.id}_dihindari`, e.target.value)}
+                            placeholder={`Tuliskan catatan observer untuk Perilaku yang Dihindari pada Indikator ${ind.id} (contoh: apakah perilaku negatif berhasil dihindari, situasi kemunculannya, atau tindak pencegahannya)...`}
+                            className="w-full text-xs p-2.5 bg-white border border-[#E8C7C1] rounded focus:outline-none focus:border-[#9C4A3D] text-[#1B2A41] transition-all resize-y placeholder:text-gray-400"
+                          />
                         </div>
                       </div>
 

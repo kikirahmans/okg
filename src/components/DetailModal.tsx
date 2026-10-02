@@ -1,7 +1,7 @@
 import React from 'react';
 import { ObservationData } from '../types';
 import { INDICATORS } from '../data/indicators';
-import { X, Printer, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { X, Printer, CheckCircle, Clock, AlertCircle, MessageSquare } from 'lucide-react';
 
 interface Props {
   record: ObservationData | null;
@@ -171,6 +171,19 @@ export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }
                       );
                     })}
 
+                    {/* Catatan Observer Dianjurkan */}
+                    {record.catatanIndikator?.[`${ind.id}_dianjurkan`] && (
+                      <div className="mt-2 p-2.5 rounded bg-[#F7FAF8] border border-[#C5D8C9] text-xs">
+                        <span className="text-[10px] font-bold text-[#3D6B4F] flex items-center gap-1.5 uppercase tracking-wider mb-1">
+                          <MessageSquare size={12} />
+                          <span>Catatan Observer (Perilaku Dianjurkan):</span>
+                        </span>
+                        <p className="text-[#1B2A41] italic pl-4 border-l-2 border-[#3D6B4F] m-0">
+                          {record.catatanIndikator[`${ind.id}_dianjurkan`]}
+                        </p>
+                      </div>
+                    )}
+
                     <p className="text-[11px] font-semibold text-[#9C4A3D] uppercase tracking-wider pt-2">Perilaku yang Dihindari</p>
                     {ind.dihindari.map((txt, idx) => {
                       const ratings = record.ratings || {};
@@ -188,6 +201,19 @@ export const DetailModal: React.FC<Props> = ({ record, onClose, onLoadIntoForm }
                         </div>
                       );
                     })}
+
+                    {/* Catatan Observer Dihindari */}
+                    {record.catatanIndikator?.[`${ind.id}_dihindari`] && (
+                      <div className="mt-2 p-2.5 rounded bg-[#FCF8F7] border border-[#E8C7C1] text-xs">
+                        <span className="text-[10px] font-bold text-[#9C4A3D] flex items-center gap-1.5 uppercase tracking-wider mb-1">
+                          <MessageSquare size={12} />
+                          <span>Catatan Observer (Perilaku Dihindari):</span>
+                        </span>
+                        <p className="text-[#1B2A41] italic pl-4 border-l-2 border-[#9C4A3D] m-0">
+                          {record.catatanIndikator[`${ind.id}_dihindari`]}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               );

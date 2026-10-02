@@ -161,6 +161,12 @@ export const INITIAL_SAMPLE_RECORDS: ObservationData[] = [
       '4_dihindari_1': 'Belum Dilakukan',
       '4_dihindari_2': 'Belum Dilakukan',
     },
+    catatanIndikator: {
+      '1_dianjurkan': 'Guru konsisten mengajak murid menyepakati aturan dan memberikan pujian tulus saat murid mematuhi protokol K3.',
+      '1_dihindari': 'Guru tidak menggunakan nada tinggi atau hukuman fisik; semua peringatan diberikan secara tenang dan proporsional.',
+      '4_dianjurkan': 'Guru mendatangi tiap kelompok kerja, mengajukan pertanyaan terbuka yang memancing murid bernalar kritis.',
+      '4_dihindari': 'Guru tidak mendominasi penjelasan, melainkan memfasilitasi murid bereksperimen mandiri.'
+    },
     catatanObs: 'Guru menguasai materi dengan sangat baik dan menerapkan aturan K3 bengkel dengan pendekatan persuasif positif.',
     rekomendasi: 'Pertahankan pemberian apresiasi pada siswa yang disiplin, serta variasikan pertanyaan pemantik untuk kelompok kerja belakang.',
     kategoriKesadaranC: 'Sadar Dampak Kesulitan',
@@ -218,6 +224,10 @@ export const INITIAL_SAMPLE_RECORDS: ObservationData[] = [
       '3_dihindari_0': 'Belum Dilakukan',
       '3_dihindari_1': 'Belum Dilakukan',
       '3_dihindari_2': 'Belum Dilakukan',
+    },
+    catatanIndikator: {
+      '3_dianjurkan': 'Guru memberikan feedback tepat waktu pada baris kode dan mengapresiasi kemajuan logika coding murid.',
+      '3_dihindari': 'Guru menghindari membandingkan kecepatan coding antar siswa dan tetap sabar membimbing.'
     },
     catatanObs: 'Guru memanggil nama siswa dengan hangat dan memberikan umpan balik langsung pada baris kode yang error.',
     rekomendasi: 'Tingkatkan pemberian petunjuk pemecahan masalah agar siswa belajar menemukan solusi secara mandiri.',

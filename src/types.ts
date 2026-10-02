@@ -32,6 +32,7 @@ export interface ObservationData {
 
   // Formulir B - Observasi
   ratings: Record<string, RatingValue>; // key: `${indId}_${type}_${idx}`
+  catatanIndikator?: Record<string, string>; // key: `${indId}_dianjurkan` & `${indId}_dihindari` (catatan observer penilai)
   catatanObs: string;
   rekomendasi: string;
 

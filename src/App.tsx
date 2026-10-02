@@ -39,6 +39,7 @@ function createNewRecord(template?: Partial<ObservationData>): ObservationData {
     hasilKerja: '',
     catatanLain: '',
     ratings: {},
+    catatanIndikator: template?.catatanIndikator || {},
     catatanObs: '',
     rekomendasi: '',
     kategoriKesadaranC: 'Sadar Kesulitan',
@@ -358,6 +359,12 @@ export default function App() {
         [`${randomInd2}_dihindari_0`]: 'Belum Dilakukan',
         [`${randomInd2}_dihindari_1`]: 'Belum Dilakukan',
         [`${randomInd2}_dihindari_2`]: 'Belum Dilakukan',
+      },
+      catatanIndikator: {
+        [`${randomInd1}_dianjurkan`]: 'Guru memfasilitasi keterlibatan murid dan memberikan apresiasi langsung atas respon positif murid.',
+        [`${randomInd1}_dihindari`]: 'Guru tidak memotong pembicaraan murid dan menghindari ucapan bernada meremehkan.',
+        [`${randomInd2}_dianjurkan`]: 'Guru aktif berkeliling memberikan bimbingan pada kelompok yang mengalami kesulitan.',
+        [`${randomInd2}_dihindari`]: 'Guru tidak membiarkan kelas pasif atau didominasi oleh segelintir murid saja.'
       },
       catatanObs: 'Guru mengarahkan siswa dengan pendekatan positif dan interaktif.',
       rekomendasi: 'Pertahankan metode bimbingan kelompok dan perkuat apresiasi belajar.',

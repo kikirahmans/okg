@@ -262,6 +262,7 @@ export function normalizeObservationRecord(raw: any): ObservationData {
       hasilKerja: '',
       catatanLain: '',
       ratings: {},
+      catatanIndikator: {},
       catatanObs: '',
       rekomendasi: '',
       kategoriKesadaranC: 'Sadar Kesulitan',
@@ -296,6 +297,16 @@ export function normalizeObservationRecord(raw: any): ObservationData {
     ratingsObj = {};
   }
 
+  // Ensure catatanIndikator is a valid object
+  const catatanIndikatorObj: Record<string, string> = {};
+  if (raw.catatanIndikator && typeof raw.catatanIndikator === 'object' && !Array.isArray(raw.catatanIndikator)) {
+    Object.entries(raw.catatanIndikator).forEach(([k, v]) => {
+      if (typeof v === 'string') {
+        catatanIndikatorObj[k] = v;
+      }
+    });
+  }
+
   // Ensure pickedIndicators is a valid number array
   let pickedIndicators = raw.pickedIndicators;
   if (!Array.isArray(pickedIndicators)) {
@@ -322,6 +333,7 @@ export function normalizeObservationRecord(raw: any): ObservationData {
     hasilKerja: String(raw.hasilKerja || ''),
     catatanLain: String(raw.catatanLain || ''),
     ratings: ratingsObj,
+    catatanIndikator: catatanIndikatorObj,
     catatanObs: String(raw.catatanObs || ''),
     rekomendasi: String(raw.rekomendasi || ''),
     kategoriKesadaranC: String(raw.kategoriKesadaranC || 'Sadar Kesulitan'),
@@ -581,7 +593,8 @@ export function exportToCSV(records: ObservationData[]): void {
     'Skor Efektif (%)',
     'Indikator Terpilih',
     'Upaya Belajar',
-    'Catatan Observasi',
+    'Catatan Indikator (Dianjurkan & Dihindari)',
+    'Catatan Umum Observasi',
     'Rekomendasi',
     'Kategori Kesadaran Refleksi',
     'Upaya Tindak Lanjut',
@@ -600,6 +613,15 @@ export function exportToCSV(records: ObservationData[]): void {
       .map(id => INDICATORS.find(i => i.id === id)?.title || `Indikator ${id}`)
       .join('; ');
 
+    const catatanIndikatorStr = (r.pickedIndicators || []).map(id => {
+      const d = r.catatanIndikator?.[`${id}_dianjurkan`];
+      const h = r.catatanIndikator?.[`${id}_dihindari`];
+      const parts = [];
+      if (d) parts.push(`[Indikator ${id} Dianjurkan: ${d}]`);
+      if (h) parts.push(`[Indikator ${id} Dihindari: ${h}]`);
+      return parts.join(' ');
+    }).filter(Boolean).join(' | ');
+
     return [
       escapeCSV(r.id),
       escapeCSV(r.tanggal),
@@ -611,6 +633,7 @@ export function exportToCSV(records: ObservationData[]): void {
       escapeCSV(`${r.persentaseEfektif}%`),
       escapeCSV(indTitles),
       escapeCSV(r.upayaBelajar),
+      escapeCSV(catatanIndikatorStr),
       escapeCSV(r.catatanObs),
       escapeCSV(r.rekomendasi),
       escapeCSV(r.kategoriKesadaranC),
